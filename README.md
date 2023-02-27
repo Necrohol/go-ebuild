@@ -8,6 +8,6 @@ how to make a setup.py for this bam... still gobsmaked.. really)
 ----###
 
 Cargo Ebuild ,,,,,, HMMM go-ebuild has been the Tool FOR YEARS ppl have WANTED NEED baddly I wont Say it works YET..
-
+few Dozen mor asks for Chatgpt and have a hopefull prototype.. 
 
 But so far Chart GPT and the Online Linter have guided me to a posible Prototype heck it even wrote make ebuild fuction alone  based on go-mod.eclass 
