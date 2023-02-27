@@ -1,5 +1,5 @@
-//go-ebuild insipred by cargo-ebuild 
-// rappidly proto-magicked into exitstance with CHATGPT 
+//go-ebuild insipred by cargo-ebuild
+// rappidly proto-magicked into exitstance with CHATGPT
 // chatGPT got mad PhD level up... helping killer skills...  :-)
 
 package main
@@ -12,67 +12,110 @@ import (
     "os"
     "os/exec"
     "strings"
-	"io/ioutil"
-
-
-"github.com/williamh/get-ego-vendor"
-// embed// include get-ego-vendor command.. 
+    
 )
+// cant embed directly ? "github.com/williamh/get-ego-vendor"
 
-package main
+func clone(repoURL string) {
+    // Set the directory to clone the repository into.
+    dir := "/tmp"
 
-import (
-	"fmt"
-	"io/ioutil"
-	"log"
-	"os"
-	"os/exec"
-)
+           // Run the "git clone" command.
+           cmd := exec.Command("git", "clone", repoURL, dir)
+                  if err := cmd.Run();
+    err != nil {
+        log.Fatal(err)
+    }
 
-func egosum() {
-	// Create a temporary file to store the output of the command.
-	f, err := ioutil.TempFile("", "egosum")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer os.Remove(f.Name())
-
-	// Run the command and write its output to the temporary file.
-	cmd := exec.Command("get-ego-vendor")
-	cmd.Stdout = f
-	if err := cmd.Run(); err != nil {
-		log.Fatal(err)
-	}
-
-	// Read the contents of the temporary file.
-	content, err := ioutil.ReadFile(f.Name())
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// Store the output in the EGO_SUM environment variable.
-	os.Setenv("EGO_SUM", string(content))
-
-	// Print the output to the console.
-	fmt.Println(string(content))
+    // Print a success message to the console.
+    log.Printf("Cloned repository from %s to %s", repoURL, dir)
 }
 
+func scantmp() {
+    // Define the path to the Git repository.
+    repoDir := "/tmp/repo.git"
+
+               // Walk the directory tree rooted at the repository path, looking for Go files.
+    err := filepath.Walk(repoDir, func(path string, info os.FileInfo, err error) error {
+        if err != nil {
+        return err
+    }
+    if info.IsDir() {
+            // Skip directories that start with a dot or underscore.
+            if strings.HasPrefix(info.Name(), ".") || strings.HasPrefix(info.Name(), "_") {
+                return filepath.SkipDir
+            }
+            return nil
+        }
+        if strings.HasSuffix(info.Name(), ".go") {
+            // Process the Go file.
+            fmt.Printf("Found Go file: %s\n", path)
+        }
+        return nil
+    })
+    if err != nil {
+    fmt.Printf("Error: %s\n", err)
+    }
+    func egosum() {
+        // Create a temporary file to store the output of the command.
+        f, err := os.CreateTemp("", "egosum")
+        if err != nil {
+        log.Fatal(err)
+        }
+        defer os.Remove(f.Name())
+
+        // Run the command and write its output to the temporary file.
+        cmd := exec.Command("get-ego-vendor")
+               cmd.Stdout = f
+                            if err := cmd.Run();
+        err != nil {
+            log.Fatal(err)
+        }
+
+        // Read the contents of the temporary file.
+        content, err := os.ReadFile(f.Name())
+        if err != nil {
+        log.Fatal(err)
+        }
+
+        // Store the output in the EGO_SUM environment variable.
+        os.Setenv("EGO_SUM", string(content))
+
+        // Print the output to the console.
+        fmt.Println(string(content))
+    }
+
+}
+
+func main() {
+    // Prompt the user for a Git repository URL.
+    var repoURL string
+    log.Print("Enter Git repository URL: ")
+    if _, err := fmt.Scanln(&repoURL);
+    err != nil {
+        log.Fatal(err)
+    }
+
+    // Clone the repository.
+    clone(repoURL)
+}
 
 func main() {
     // Prompt the user for a Git repository URL.
     var repo string
     fmt.Print("Enter Git repository URL: ")
-    if _, err := fmt.Scanln(&repo); err != nil {
+    if _, err := fmt.Scanln(&repo);
+    err != nil {
         log.Fatal(err)
     }
     fmt.Printf("You entered: %s\n", repo)
 
     // Run "go list -json -m all" to retrieve information about all dependencies.
     cmd := exec.Command("go", "list", "-json", "-m", "all")
-    cmd.Dir = os.Getenv("GOPATH") + "/src/" + repo
-    out, err := cmd.Output()
+           cmd.Dir = os.Getenv("GOPATH") + "/src/" + repo
+                     out, err := cmd.Output()
     if err != nil {
-        log.Fatal(err)
+    log.Fatal(err)
     }
 
     // Parse the output of "go list" to extract information about the dependencies.
@@ -83,10 +126,12 @@ func main() {
             Version  string
             Licenses []struct{ Type string }
         }
-        if err := scanner.Err(); err != nil {
+        if err := scanner.Err();
+        err != nil {
             log.Fatal(err)
         }
-        if err := json.Unmarshal(scanner.Bytes(), &mod); err != nil {
+        if err := json.Unmarshal(scanner.Bytes(), &mod);
+        err != nil {
             log.Fatal(err)
         }
 
@@ -95,31 +140,38 @@ func main() {
     }
 }
 
-func writeEbuild(path, version string, licenses []struct{ Type string }) {
+func writeEbuild(path, version string, licenses []struct { Type string }) {
     // Generate the metadata for the ebuild.
     pkg := strings.ReplaceAll(path, "/", "-")
-    metadata := fmt.Sprintf(`# Generated by go-ebuild
-EAPI=7
-inherit go-module
-GITHUB_USER=user
-GITHUB_REPO=%s
-EGO_SUM="%s"
-LICENSE="%s"
-`, path, version, licenses[0].Type)
+           metadata := fmt.Sprintf(`# Generated by go-ebuild
+                                   EAPI=7
+                                        inherit go-module
+                                        GITHUB_USER=user
+                                                GITHUB_REPO=%s
+                                                        EGO_SUM="%s"
+                                                                LICENSE="%s"
+                                                                        `, path, version, licenses[0].Type)
 
-    // Write the metadata and build instructions to the ebuild file.
-    f, err := os.Create(fmt.Sprintf("%s-%s.ebuild", pkg, version))
+                       // Write the metadata and build instructions to the ebuild file.
+                       f, err := os.Create(fmt.Sprintf("%s-%s.ebuild", pkg, version))
     if err != nil {
-        log.Fatal(err)
+    log.Fatal(err)
     }
     defer f.Close()
     f.WriteString(metadata)
     f.WriteString(fmt.Sprintf(`src_compile() {
-    go-module_src_compile
-}
+        go-module_src_compile
+    }
 
-src_install() {
-    go-module_src_install
+    src_install() {
+        go-module_src_install
+    }
+    `))
 }
-`))
+func cleanup() {
+    // Remove the directory and all its contents.
+    err := os.RemoveAll("/tmp/repo.git")
+    if err != nil {
+    log.Fatal(err)
+    }
 }
