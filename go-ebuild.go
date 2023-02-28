@@ -55,9 +55,9 @@ func findGoFiles(root string) ([]string, error) {
 		return nil
 	})
 	if err != nil {
-		return nil, fmt.Errorf("failed to scan repository: %v", err)
-	}
-	return files, nil
+	
+	r	return nil, fmt.Errorf("failed to scan repository: %v", err)
+	}eturn files, nil
 }
 
 func prompt(message string) (string, error) {
