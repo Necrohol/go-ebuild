@@ -2,6 +2,7 @@
 
 go-ebuild
 =========
+https://github.com/spf13/cobra-cli / https://github.com/spf13/cobra-cli added for better hevey lifting and more RAD/protyping
 
 * * *
 
