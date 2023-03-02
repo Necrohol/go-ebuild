@@ -1,40 +1,63 @@
-/*
-Copyright © 2023 NAME HERE <EMAIL ADDRESS>
-
-*/
-package cmd
+package go_ebuild_batch // ./cmd/batch.go
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	"github.com/ahmedalhulaibi/flatfile"
 )
+// allow flatfile db store
 
-// batchCmd represents the batch command
-var batchCmd = &cobra.Command{
-	Use:   "batch",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+// some time long from now
+var rootCmd = &cobra.Command{
+	Use:   "go-ebuild --batch ",
+	Short: "Runs go-ebuild against some config files for on-mass automated conversion",
+	Long:  "Future planned developer feature, YAML, URL, file and DB convert dozens of golang/Gosum into ebuilds..",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("batch called")
+		fmt.Println("Welcome to go-ebuild! Batch mode!! Convert all the Go things to Gentoo ebuilds")
 	},
 }
 
 func init() {
-	rootCmd.AddCommand(batchCmd)
+	rootCmd.AddCommand(batch)
 
 	// Here you will define your flags and configuration settings.
+}
 
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// batchCmd.PersistentFlags().String("foo", "", "A help for foo")
+func main() {
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+}
 
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// batchCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+func userConfigsIn() {
+	// store settings in ("$HOME/.go-ebuild/")
+
+	viper.SetConfigName("Gentoo-repos") // name of config file (without extension)
+
+	viper.SetConfigType("yaml") // REQUIRED if the config file does not have the extension in the name
+
+	viper.AddConfigPath("$HOME/.go-ebuild/Gentoo-repos") // gentoo-overlay/s to put ebuilds into..//
+
+	viper.SetConfigName("cache") // name of config file (without extension)
+	viper.SetConfigType("db")    // REQUIRED if the config file does not have the extension in the name
+	viper.AddConfigPath("$HOME/.go-ebuild/cache.db")     // cache.db
+
+	viper.SetConfigName("go-lang-repos") // name of config file (without extension)
+	viper.SetConfigType("ini")           // REQUIRED if the config file does not have the extension in the name
+	viper.AddConfigPath("$HOME/.go-ebuild/go-lang-repos.list") // list of github repos to process on mass containing URL's of golang repos to make ebuilds into
+	err := viper.ReadInConfig()                                 // Find and read the config file
+	if err != nil {                                             // Handle errors reading the config file
+		panic(fmt.Errorf("fatal error config file: %w", err))
+	}
+}
+func userConfigs-io(){
+viper.WriteConfig() // writes current config to predefined path set by 'viper.AddConfigPath()' and 'viper.SetConfigName'
+viper.SafeWriteConfig()
+viper.WriteConfigAs("/path/to/my/.config")
+viper.SafeWriteConfigAs("/path/to/my/.config") // will error since it has already been written
+viper.SafeWriteConfigAs("/path/to/my/.other_config")
 }
