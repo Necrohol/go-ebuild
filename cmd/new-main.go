@@ -6,9 +6,15 @@ import (
 	"os"
 	"os/exec"
 	"strings"
-
+	
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"regexp"
+	"strings"
+	"path/filepath"
+	"github.com/pelletier/go-toml"
+	"go-dep-parser/blob/main/pkg/golang/mod/parse.go"
+	"aquasecurity/go-dep-parser/blob/main/pkg/golang/sum/parse.go" 
 )
 
 var rootCmd = &cobra.Command{
@@ -23,7 +29,7 @@ var rootCmd = &cobra.Command{
 var egosumCmd = &cobra.Command{
 	Use:   "egosum",
 	Short: "Calculate the checksum of dependencies specified in go.mod",
-	Long:  `A command that calculates the checksum of dependencies specified in go.mod using the 'get-ego-vendor' command and stores it in the EGO_SUM environment variable.`,
+	Long:  `A command that calculates the checksum of dependencies specified in go.mod using the 'get-ego-vendor' command/stores to:EGO_SUM environment variable.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		// Check if the "get-ego-vendor" command is available.
 		_, err := exec.LookPath("get-ego-vendor")
@@ -96,3 +102,21 @@ func main() {
 	}
 }
 ``
+
+
+
+flag.Var(&go-ebuild, "--git", "read metadata by cloning a git repo to ./tmp or users ./tmp ")
+
+// append to end of package root Program//
+// add a gracefull exit 
+// I would add a random Quote n exit but for now keep it simple 
+
+var rootCmd = &cobra.Command{
+	Use:   "go-ebild Exit",
+	Short: "Quit/Exit This utility",
+	Long:  `A CLI tool for managing Gentoo ebuilds written in Go, powered by Cobra and Viper.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("Have A Nice Day!!, Hopefully You have Enjoied using go-ebuild!")
+		 os.Exit(1)
+	},
+}
