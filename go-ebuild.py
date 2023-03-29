@@ -14,6 +14,7 @@ pkgname = input("Enter the package name: ")
 ebuild_path = input("Enter the path to the ebuild directory: ")
 maintainer = input("Enter the PKG-Maintainer/Your Email: ")
 homepage = input("Enter the package Homepage-URL ")
+ebuild.src_uri = input("Enter the package Homepage-URL ")
 pkg-license = input("Enter the package license Type IE: MIT GPL etc.. ")
 # Prompt the user for the package description and store it in a variable
 pkg_description = input("Enter the package description: ")
