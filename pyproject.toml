@@ -1,23 +1,69 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
-
 [project]
-name = "example_package_YOUR_USERNAME_HERE"
-version = "0.0.1"
+name = "go-ebuild"
+description = "go-ebuild` is a Python script that generates ebuild skeletons for Golang packages, inspired by the `Cargo Ebuild` project for Rust."
 authors = [
-  { name="Example Author", email="author@example.com" },
+  { name = "Mike Lawrence", email = "necrose99@protonmail.com" }
 ]
-description = "A small example package"
-readme = "README.md"
+license = { text = "MIT" }
 requires-python = ">=3.8"
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
+dynamic = ["version", "readme"]
+
+[tool.setuptools.dynamic]
+version = {attr = "go_ebuild.__version__"}
+readme = {file = ["README.md"]}
+
+[tool.setuptools.packages.find]
+include = ["go_ebuild*"]
+
+[tool.setuptools.package-data]
+go_ebuild = ["py.typed"]
+
+[tool.mypy]
+check_untyped_defs = true
+disallow_untyped_defs = true
+
+[[tool.mypy.overrides]]
+module = ["tests.*"]
+disallow_untyped_defs = false
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "--cov=go_ebuild --cov-report term-missing --no-cov-on-fail"
+
+[tool.coverage.report]
+exclude_lines = ["if __name__ == .__main__.:", "pragma: no cover"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py38"
+fix = true
+
+[tool.ruff.lint]
+select = ["E", "B", "F", "UP", "I001", "T201", "T203"]
+ignore=[
+  # Recommended ignores by ruff when using formatter
+  "E501",
+  "W191",
+  "E111",
+  "E114",
+  "E117",
+  "D206",
+  "D300",
+  "Q000",
+  "Q001",
+  "Q002",
+  "Q003",
+  "COM812",
+  "COM819",
+  "ISC001",
+  "ISC002",
 ]
 
-[project.urls]
-Homepage = "https://github.com/pypa/sampleproject"
-Issues = "https://github.com/pypa/sampleproject/issues"
+[tool.poetry.dependencies]
+python = "^3.12"
+"snakeoil" 
+"g-sorcery"
