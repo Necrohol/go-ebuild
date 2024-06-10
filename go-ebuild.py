@@ -1,63 +1,91 @@
-#!/usr/bin/env python
-# https://chat.openai.com/chat/42717af4-33c0-425d-8487-781bd753b5c3 
+#!/usr/bin/env python3
 import os
 from g_sorcery.ebuild import Ebuild
 from g_sorcery.package import Package
 from g_sorcery.version import Version
 
-# Define some variables for the ebuild
+# Define some variables for the ebuild / ask for user inputs
 pkgname = input("Enter the package name: ")
-ebuild_path = input("Enter the path to the ebuild directory: ")
-go_versions = [">=1.16"]
-# Define some variables for the ebuild
-pkgname = input("Enter the package name: ")
-ebuild_path = input("Enter the path to the ebuild directory: ")
-maintainer = input("Enter the PKG-Maintainer/Your Email: ")
-homepage = input("Enter the package Homepage-URL ")
-ebuild.src_uri = input("Enter the package Homepage-URL ")
-pkg-license = input("Enter the package license Type IE: MIT GPL etc.. ")
-# Prompt the user for the package description and store it in a variable
-pkg_description = input("Enter the package description: ")
+ebuild_path = input("Enter the ebuild file path: ")
+maintainer = input("Enter the maintainer email: ")
+homepage = input("Enter the homepage URL: ")
+description = input("Enter the package description: ")
+additional_dependencies = input("Enter additional dependencies (comma separated): ").split(',')
+additional_rdeps = input("Enter additional reverse dependencies (comma separated): ").split(',')
 
-# Use the variable to set the ebuild description field for g-sourcey compat. 
-ebuild.description = pkg_description
-ebuild.license = "pkg-license"
+# Create an Ebuild object
+ebuild = Ebuild(
+    pkgname=pkgname,
+    path=ebuild_path,
+    maintainer=maintainer,
+    homepage=homepage,
+    description=description
+)
 
-# Use the G-Sorcery library to obtain the package's version
-try:
-    package = Package(pkgname)
-    latest_version = package.latest_version()
-    version = Version(latest_version)
-    pkgver = version.version
-except Exception as e:
-    print(f"Failed to obtain version for {pkgname}: {str(e)}")
-    exit(1)
+# Example function to initialize the ebuild
+def initialize_ebuild(ebuild):
+    print("Initializing ebuild...")
+    # Here you can add logic to initialize the ebuild
+    # This could involve writing the ebuild file to the filesystem, etc.
+    ebuild.write_to_file()
+    print(f"Ebuild for package '{ebuild.pkgname}' has been initialized at '{ebuild.path}'")
 
-# Create the ebuild directory if it doesn't exist
-if not os.path.exists(ebuild_path):
-    os.makedirs(ebuild_path)
+# Example function to add dependencies
+def add_dependencies(ebuild, dependencies):
+    print("Adding dependencies...")
+    for dep in dependencies:
+        if dep:  # Check if the dependency is not an empty string
+            ebuild.add_dependency(dep)
+    print(f"Dependencies added: {dependencies}")
 
-# Create the ebuild file using the g_sorcery library
-ebuild = Ebuild(pkgname, pkgver, maintainer=maintainer, homepage=homepage)
-ebuild.inherit( "go-module")
-ebuild.description = input("Enter the package description: ")
-ebuild.src_uri = f"https://www.example.com/{pkgname}-{pkgver}.tar.gz"
-for go_version in go_versions:
-    ebuild.depend(f"dev-lang/go:{go_version}")
-ebuild.slot = "0"
-ebuild.license = "MIT"
-ebuild.iuse = ""
-ebuild.s = f"${{WORKDIR}}/{pkgname}-${{PV}}"
-ebuild.install.append("emake")
-ebuild.install.append("default")
-ebuild.test.append("emake test")
+# Example function to add reverse dependencies
+def add_reverse_dependencies(ebuild, reverse_dependencies):
+    print("Adding reverse dependencies...")
+    for rdep in reverse_dependencies:
+        if rdep:  # Check if the reverse dependency is not an empty string
+            ebuild.add_reverse_dependency(rdep)
+    print(f"Reverse dependencies added: {reverse_dependencies}")
 
-# Write the ebuild to a file
-with open(os.path.join(ebuild_path, f"{pkgname}-{pkgver}.ebuild"), "w") as f:
-    f.write(str(ebuild))
+# Mock-up example for dynamic selection of Go eclasses in Gentoo for parsing go to ebuilds
+class GoEclass:
+    def __init__(self, name):
+        self.name = name
 
-# Make the ebuild executable
-os.chmod(os.path.join(ebuild_path, f"{pkgname}-{pkgver}.ebuild"), 0o755)
+    def apply(self):
+        print(f"Applying {self.name}")
 
-# Print a message indicating that the ebuild has been generated
-print(f"Ebuild for {pkgname}-{pkgver} has been generated in {ebuild_path}")
+# List of available eclasses
+eclasses = {
+    'go-env.eclass': GoEclass('go-env.eclass'),
+    'golang-base.eclass': GoEclass('golang-base.eclass'),
+    'golang-build.eclass': GoEclass('golang-build.eclass'),
+    'golang-vcs.eclass': GoEclass('golang-vcs.eclass'),
+    'golang-vcs-snapshot.eclass': GoEclass('golang-vcs-snapshot.eclass'),
+    'go-module.eclass': GoEclass('go-module.eclass')
+}
+
+# Dynamic selection of eclasses based on some criteria
+def select_eclasses(criteria):
+    selected = []
+    for name, eclass in eclasses.items():
+        if criteria in name:
+            selected.append(eclass)
+    return selected
+
+# Example usage
+if __name__ == "__main__":
+    # Initialize the ebuild
+    initialize_ebuild(ebuild)
+
+    # Add dependencies
+    add_dependencies(ebuild, additional_dependencies)
+
+    # Add reverse dependencies
+    add_reverse_dependencies(ebuild, additional_rdeps)
+
+    # Dynamic selection of eclasses based on criteria
+    criteria = 'golang'  # This could be any dynamic criteria
+    selected_eclasses = select_eclasses(criteria)
+
+    for eclass in selected_eclasses:
+        eclass.apply()
