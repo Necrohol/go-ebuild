@@ -170,3 +170,19 @@ if __name__ == "__main__":
     
     # Write the ebuild file
     ebuild.write_to_file()
+    
+    from go-ebuild-meta import run_metadata_generation
+
+# ... (your existing code for generating the ebuild file)
+
+# Generate metadata and manifest files
+package_info = {
+    "name": pkgname,
+    "homepage": homepage,
+    "description": description,
+    "use_flags": ["..."]  # Populate with appropriate USE flags
+}
+metadata_file, manifest_file = run_metadata_generation(package_info, ebuild_path)
+
+print(f"Generated metadata file: {metadata_file}")
+print(f"Generated manifest file: {manifest_file}")

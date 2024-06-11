@@ -1,35 +1,52 @@
 ﻿# go-ebuild
 
-`go-ebuild` is a Python script that generates ebuild skeletons for Golang packages, inspired by the `Cargo Ebuild` project for Rust.
-https://crates.io/crates/python-project-generator to facilitate migration over time to a setup.py setuptools installable tool 
+`go-ebuild` is a Python script that generates ebuild skeletons for Go packages in Gentoo Linux, inspired by the excellent `cargo-ebuild` tool for Rust packages.
 
-## Overview
+## 🚀 Vision
 
-The goal of `go-ebuild` is to simplify the process of creating ebuilds for Go packages in Gentoo. It automates the generation of ebuild skeletons, reducing manual work and potential errors.
+Every `go get` should have its Gentoo ebuild! Just like `cargo-ebuild` has simplified packaging Rust projects for even novice Gentoo users, `go-ebuild` aims to do the same for Go packages. 
+We want to make it so easy that even a newcomer to Gentoo can package their favorite Go tools.
 
-## Dependencies
+## 🛠 Current State
 
-- `snakeoil`: A library providing various utility functions.
-- `g_sorcery`: A framework for automated ebuild generators.
+`go-ebuild` is in early development. It can generate basic ebuild skeletons, but there's a lot of room for improvement. Here's what it can do:
 
-## Why Python?
+- Generate an ebuild file with basic metadata (name, version, description, etc.)
+- Include user-specified licenses (defaulting to GPL-2, Gentoo's recommendation)
+- Add user-provided dependencies and reverse dependencies
+- Incorporate user-specified Go eclasses
 
-Initially, we attempted to write `go-ebuild` in Go to match the language of the packages it handles. However, the complexity of working with ebuilds in Go led us to switch to Python. The excellent libraries and ease of text manipulation in Python make it a better fit for this task.
+## 🎯 Roadmap
 
-## Usage
+- [ ] Automatically detect required Go eclasses (`go-module.eclass`, `golang-build.eclass`, etc.)
+- [ ] Parse `go.mod` and `go.sum` to determine dependencies
+- [ ] Automate license detection from source files
+- [ ] Generate `metadata.xml` with USE flags
+- [ ] Integrate with `dev-util/pkgdev` tools for ebuild manifest generation
+- [ ] Use `metagen` to generate comprehensive `metadata.xml` files
+- [ ] Validate ebuilds with Gentoo's QA tools
+- [ ] Create a command-line interface as polished as `cargo-ebuild`
 
-[Provide instructions on how to use your script, including command-line arguments, input, and output.] 
-basic user promts are in the script for information , ie pkg name etc , depends,  rdepends  url etc.. 
+## 🤝 Contributing
 
-## Contributing
+We're at an early stage and could really use your help! Whether you're a Go guru, a Gentoo geek, or just enthusiastic about making developers' lives easier, there's a place for you:
 
-Contributions are welcome! Please read our contributing guidelines before submitting pull requests.
+- 🐛 **Bug Hunters**: Test the script and report issues.
+- 🧪 **QA Heroes**: Help integrate Gentoo's QA practices.
+- 🎨 **UI/UX Designers**: Make our CLI as slick as `cargo-ebuild`.
+- 🧑‍💻 **Coders**: From Go module parsing to `snakeoil` wizardry, we need you!
 
-## License
+No contribution is too small. Let's make packaging Go as easy as `go get`!
 
-[Specify the license under which you're releasing your code, e.g., MIT, GPL, etc.]
+## 🚦 Prerequisites
 
-## Acknowledgements
+- Python 3.x
+- `snakeoil` library (core to Gentoo, including Portage)
 
-- Inspired by the `Cargo Ebuild` project.
-- Thanks to the `snakeoil` and `g_sorcery` projects for making this tool possible.
+## 🏃 Quick Start
+
+```bash
+git clone https://github.com/Necrohol/go-ebuild.git
+cd go-ebuild
+python3 go-ebuild.py
+# Follow the interactive prompts
