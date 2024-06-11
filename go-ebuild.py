@@ -19,29 +19,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+# go-ebuild.py
+#!/usr/bin/env python3
 import os
-import re
+import json
+import sys
 from pathlib import Path
-from snakeoil.bash import BashParseError, iter_read_bash
 from snakeoil.fileutils import AtomicWriteFile
-
-# Define some variables for the ebuild / ask for user inputs
-pkgname = input("Enter the package name: ")
-version = input("Enter the package version: ")
-ebuild_path = input("Enter the ebuild file path: ")
-maintainer = input("Enter the maintainer email: ")
-homepage = input("Enter the homepage URL: ")
-description = input("Enter the package description: ")
-additional_dependencies = input("Enter additional dependencies (space separated): ").split()
-additional_rdeps = input("Enter additional reverse dependencies (space separated): ").split()
-
-# New input for license
-licenses = input("Enter license types (space separated), or press Enter for default 'GPL-2': ").split()
-if not licenses:
-    licenses = ["GPL-2"]
-
-# New input for golang eclasses
-golang_eclasses = input("Enter golang eclass(es) if known (space separated): ").split()
 
 # Ebuild class using snakeoil
 class Ebuild:
@@ -108,17 +92,6 @@ src_install() {{
             f.write(ebuild_content)
         print(f"Ebuild for package '{self.pkgname}' has been written to '{self.path}'")
 
-# Create an Ebuild object
-ebuild = Ebuild(
-    pkgname=pkgname,
-    version=version,
-    path=ebuild_path,
-    maintainer=maintainer,
-    homepage=homepage,
-    description=description,
-    licenses=licenses
-)
-
 # Function to add dependencies
 def add_dependencies(ebuild, dependencies):
     print("Adding dependencies...")
@@ -135,54 +108,61 @@ def add_reverse_dependencies(ebuild, reverse_dependencies):
             ebuild.add_reverse_dependency(rdep)
     print(f"Reverse dependencies added: {reverse_dependencies}")
 
-# List of available Golang eclasses
-eclasses = {
-    'go-env.eclass': 'go-env.eclass',
-    'golang-base.eclass': 'golang-base.eclass',
-    'golang-build.eclass': 'golang-build.eclass',
-    'golang-vcs.eclass': 'golang-vcs.eclass',
-    'golang-vcs-snapshot.eclass': 'golang-vcs-snapshot.eclass',
-    'go-module.eclass': 'go-module.eclass'
-}
-
 # Function to add eclasses
 def add_eclasses(ebuild, golang_eclasses):
     print("Adding eclasses...")
     for eclass in golang_eclasses:
-        if eclass in eclasses:
-            ebuild.add_eclass(eclass)
-        else:
-            print(f"Warning: '{eclass}' is not a known Golang eclass.")
+        ebuild.add_eclass(eclass)
     print(f"Eclasses added: {golang_eclasses}")
 
 # Get current year for copyright
 ebuild_year = os.popen('date +%Y').read().strip()
 
-# Example usage
 if __name__ == "__main__":
+    # Read the JSON data from stdin
+    json_data = sys.stdin.read()
+
+    # Parse the JSON data
+    package_info = json.loads(json_data)
+
+    # Create an Ebuild object
+    ebuild = Ebuild(
+        pkgname=package_info["pkgname"],
+        version="1.0",  # Placeholder, adjust as needed
+        path=f"{package_info['pkgname']}.ebuild",
+        maintainer=package_info["maintainer"],
+        homepage=package_info["homepage"],
+        description=package_info["description"],
+        licenses=package_info["licenses"]
+    )
+
     # Add dependencies
-    add_dependencies(ebuild, additional_dependencies)
+    add_dependencies(ebuild, package_info["dependencies"])
+
     # Add reverse dependencies
-    add_reverse_dependencies(ebuild, additional_rdeps)
+    add_reverse_dependencies(ebuild, package_info["rdependencies"])
     
-    # Add user-specified golang eclasses
-    add_eclasses(ebuild, golang_eclasses)
-    
+    # Add suggested eclasses
+    add_eclasses(ebuild, package_info["suggested_eclasses"])
+
     # Write the ebuild file
     ebuild.write_to_file()
-    
-    from go-ebuild-meta import run_metadata_generation
 
-# ... (your existing code for generating the ebuild file)
+    # Example metadata generation function (placeholder)
+    def run_metadata_generation(package_info, ebuild_path):
+        # Dummy implementation
+        metadata_file = ebuild_path.with_suffix('.metadata.xml')
+        manifest_file = ebuild_path.with_suffix('.Manifest')
+        # Write metadata and manifest files
+        metadata_content = f"<pkgmetadata>\n  <herd>gentoo</herd>\n  <maintainer>\n    <email>{package_info['maintainer']}</email>\n  </maintainer>\n</pkgmetadata>"
+        manifest_content = "DIST {} 0 BLAKE2B HASH".format(ebuild_path.name)
+        with open(metadata_file, 'w') as f:
+            f.write(metadata_content)
+        with open(manifest_file, 'w') as f:
+            f.write(manifest_content)
+        return metadata_file, manifest_file
 
-# Generate metadata and manifest files
-package_info = {
-    "name": pkgname,
-    "homepage": homepage,
-    "description": description,
-    "use_flags": ["..."]  # Populate with appropriate USE flags
-}
-metadata_file, manifest_file = run_metadata_generation(package_info, ebuild_path)
-
-print(f"Generated metadata file: {metadata_file}")
-print(f"Generated manifest file: {manifest_file}")
+    # Generate metadata and manifest files
+    metadata_file, manifest_file = run_metadata_generation(package_info, ebuild.path)
+    print(f"Generated metadata file: {metadata_file}")
+    print(f"Generated manifest file: {manifest_file}")

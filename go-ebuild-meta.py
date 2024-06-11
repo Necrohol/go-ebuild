@@ -1,3 +1,4 @@
+# go-ebuild-meta.py
 import subprocess
 from pathlib import Path
 import pkgdev
