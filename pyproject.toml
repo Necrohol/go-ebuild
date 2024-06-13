@@ -8,62 +8,33 @@ description = "go-ebuild` is a Python script that generates ebuild skeletons for
 authors = [
   { name = "Mike Lawrence", email = "necrose99@protonmail.com" }
 ]
-license = { text = "MIT" }
+license = "MIT"
 requires-python = ">=3.8"
-dynamic = ["version", "readme"]
 
+[tool.setuptools]
 [tool.setuptools.dynamic]
 version = {attr = "go_ebuild.__version__"}
 readme = {file = ["README.md"]}
 
-[tool.setuptools.packages.find]
-include = ["go_ebuild*"]
-
-[tool.setuptools.package-data]
-go_ebuild = ["py.typed"]
-
-[tool.mypy]
-check_untyped_defs = true
-disallow_untyped_defs = true
-
-[[tool.mypy.overrides]]
-module = ["tests.*"]
-disallow_untyped_defs = false
-
-[tool.pytest.ini_options]
-minversion = "6.0"
-addopts = "--cov=go_ebuild --cov-report term-missing --no-cov-on-fail"
-
-[tool.coverage.report]
-exclude_lines = ["if __name__ == .__main__.:", "pragma: no cover"]
-
-[tool.ruff]
-line-length = 100
-target-version = "py38"
-fix = true
-
-[tool.ruff.lint]
-select = ["E", "B", "F", "UP", "I001", "T201", "T203"]
-ignore=[
-  # Recommended ignores by ruff when using formatter
-  "E501",
-  "W191",
-  "E111",
-  "E114",
-  "E117",
-  "D206",
-  "D300",
-  "Q000",
-  "Q001",
-  "Q002",
-  "Q003",
-  "COM812",
-  "COM819",
-  "ISC001",
-  "ISC002",
-]
-
 [tool.poetry.dependencies]
 python = "^3.12"
-"snakeoil" 
-"g-sorcery"
+gitpython = "^3.1.18"
+pygithub = "^1.55"
+python-gitlab = "^2.10.1"
+gopygo = "^0.2.0"
+golicense-classifier = "^0.1.0"
+snakeoil = "^1.0.0"
+
+[project.urls]
+Homepage = "https://example.com"
+Repository = "https://github.com/Necrohol/go-ebuild"
+Issues = "https://github.com/Necrohol/go-ebuild/issues"
+
+[project.dependencies]
+python = "^3.12"
+gitpython = "^3.1.18"
+pygithub = "^1.55"
+python-gitlab = "^2.10.1"
+gopygo = "^0.2.0"
+golicense-classifier = "^0.1.0"
+snakeoil = "^1.0.0"
